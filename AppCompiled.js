@@ -241,6 +241,21 @@ var scriptValue = "// function ZooniverseRainfallRescueFormAlign() {\n"+
 "        formTableRowsInputs.push(formTableRows[i]);\n"+
 "        rowsFound++;\n"+
 "      }\n"+
+"      \n"+
+"      if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-control_checksum' + ' ') > -1) {\n"+
+"        var tdElements = formTableRows[i].getElementsByTagName('td');\n"+
+"        var formTableTdCalculated = tdElements[0];\n"+
+"        var formTableTdIsDiffer = tdElements[1];\n"+
+"        \n"+
+"        var childNodes = formTableTdCalculated.childNodes;\n"+
+"        for (k = 0; k < childNodes.length; k++) {\n"+
+"          formTableTdCalculated.removeChild(childNodes[k]);\n"+
+"        }\n"+
+"        var childNodes = formTableTdIsDiffer.childNodes;\n"+
+"        for (k = 0; k < childNodes.length; k++) {\n"+
+"          formTableTdIsDiffer.removeChild(childNodes[k]);\n"+
+"        }\n"+
+"      }\n"+
 "    }\n"+
 "    \n"+
 "    \n"+
@@ -324,6 +339,17 @@ var scriptValue = "// function ZooniverseRainfallRescueFormAlign() {\n"+
 "      }\n"+
 "    }\n"+
 "    \n"+
+"    // control checksum\n"+
+"    \n"+
+"    var formTableRows = formTable.getElementsByTagName('tr');\n"+
+"    for (i = 0; i < formTableRows.length; i++) {\n"+
+"      if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {\n"+
+"        var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];\n"+
+"        \n"+
+"        inputTextarea.addEventListener(\"input\", ZooniverseRainfallRescueFormAlignChecksum);\n"+
+"      }\n"+
+"    }\n"+
+"    \n"+
 "    \n"+
 "    // turn off timer\n"+
 "    \n"+
@@ -333,8 +359,104 @@ var scriptValue = "// function ZooniverseRainfallRescueFormAlign() {\n"+
 "  }, 300, setIntervalIdBox);\n"+
 "  setIntervalIdBox.push(setIntervalId);\n"+
 "}\n"+
-"function ZooniverseRainfallRescueFormAlignReloadForm() {\n"+
+"function ZooniverseRainfallRescueFormAlignChecksum() {\n"+
 "  \n"+
+"  var formTable = document.getElementById('greasemonkey-zooniverse-rainfall-rescue-form-form_table');\n"+
+"  \n"+
+"  \n"+
+"  var formTableRows = formTable.getElementsByTagName('tr');\n"+
+"  \n"+
+"  var sumValue = 0;\n"+
+"  var difference = 0;\n"+
+"  var isDiffer = false;\n"+
+"  var maxPrecision = 0;\n"+
+"  \n"+
+"  for (i = 0; i < formTableRows.length; i++) {\n"+
+"    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {\n"+
+"      var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];\n"+
+"      \n"+
+"      var inputValue = parseFloat(inputTextarea.value);\n"+
+"      if (isNaN(inputValue)) {\n"+
+"        inputValue = 0;\n"+
+"      }\n"+
+"//       alert(1);\n"+
+"      var numberText = inputTextarea.value.trim().replace(',', '.');\n"+
+"//       alert(2);\n"+
+"      if (numberText.indexOf('.') > -1) {\n"+
+"//       alert(3);\n"+
+"        var numberParts = numberText.split('.');\n"+
+"//       alert(4);\n"+
+"        var numberPrecision = numberParts[1].length;\n"+
+"//       alert(5);\n"+
+"        if (numberPrecision> maxPrecision) {\n"+
+"//       alert(6);\n"+
+"          maxPrecision = numberPrecision;\n"+
+"        }\n"+
+"      }\n"+
+"      if (i<13) {\n"+
+"        sumValue = sumValue + inputValue;\n"+
+"      } else {\n"+
+"        var tmpsumValue = sumValue;\n"+
+"        var tmpinputValue = inputValue;\n"+
+"        if (maxPrecision > 0) {\n"+
+"//       alert(7);\n"+
+"          for (j=0; j<maxPrecision; j++) {\n"+
+"//       alert(8);\n"+
+"            tmpsumValue = tmpsumValue * 10;\n"+
+"            tmpinputValue = tmpinputValue * 10;\n"+
+"          }\n"+
+"//       alert(9);\n"+
+"        }\n"+
+"        tmpsumValue = Math.round(tmpsumValue);\n"+
+"//       alert(10);\n"+
+"        tmpinputValue = Math.round(tmpinputValue);\n"+
+"//       alert(11);\n"+
+"        \n"+
+"        \n"+
+"        if (tmpsumValue == tmpinputValue) {\n"+
+"          isDiffer = false;\n"+
+"        } else {\n"+
+"          isDiffer = true;\n"+
+"          difference = inputValue - sumValue;\n"+
+"        }\n"+
+"      }\n"+
+"    }\n"+
+"    \n"+
+"    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-control_checksum' + ' ') > -1) {\n"+
+"      var tdElements = formTableRows[i].getElementsByTagName('td');\n"+
+"      var formTableTdCalculated = tdElements[0];\n"+
+"      var formTableTdIsDiffer = tdElements[1];\n"+
+"      \n"+
+"      var childNodes = formTableTdCalculated.childNodes;\n"+
+"      for (k = 0; k < childNodes.length; k++) {\n"+
+"        formTableTdCalculated.removeChild(childNodes[k]);\n"+
+"      }\n"+
+"      var childNodes = formTableTdIsDiffer.childNodes;\n"+
+"      for (k = 0; k < childNodes.length; k++) {\n"+
+"        formTableTdIsDiffer.removeChild(childNodes[k]);\n"+
+"      }\n"+
+"      \n"+
+"      var checksumSpan = document.createElement('span');\n"+
+"      var checksumContents = document.createTextNode(sumValue);\n"+
+"      checksumSpan.appendChild(checksumContents);\n"+
+"      formTableTdCalculated.appendChild(checksumSpan);\n"+
+"      \n"+
+"      var summarySpan = document.createElement('span');\n"+
+"      if (!isDiffer) {\n"+
+"        var summaryContents = document.createTextNode('equal');\n"+
+"      } else {\n"+
+"        var summaryContents = document.createTextNode(difference);\n"+
+"        if (difference > 0) {\n"+
+"          summarySpan.style.color = 'red';\n"+
+"        } else {\n"+
+"          summarySpan.style.color = 'blue';\n"+
+"        }\n"+
+"      }\n"+
+"      \n"+
+"      summarySpan.appendChild(summaryContents);\n"+
+"      formTableTdIsDiffer.appendChild(summarySpan);\n"+
+"    }\n"+
+"  }\n"+
 "}";
 
 var setIntervalIdBox = [];
@@ -450,7 +572,7 @@ var setIntervalId = setInterval(function(){
   formOverlayContainerDiv.style.backgroundColor = 'white';
   
   var formRowFirstRowOffsetTop = "8px";
-  var formRowHeight = "36px"; // with borderBottom 1px = 37px
+  var formRowHeight = "35px"; // with borderBottom 1px = 36px
   var formRowTotalTop = "19px";
   var formPositionTop = "429px";
   var formPositionLeft = "860px";
@@ -736,6 +858,28 @@ var setIntervalId = setInterval(function(){
       break;
     }
   }
+  
+  // control checksum
+  
+  var formRow = document.createElement('TR');
+  
+  formTableTbody.appendChild(formRow);
+  var formTableTdCalculated = document.createElement('TD');
+  formRow.appendChild(formTableTdCalculated);
+  formRow.className = "greasemonkey-zooniverse-rainfall-rescue-form-control_checksum";
+  
+  var formTableTdIsDiffer = document.createElement('TD');
+  formRow.appendChild(formTableTdIsDiffer);
+  
+  var formTableRows = formTable.getElementsByTagName('tr');
+  for (i = 0; i < formTableRows.length; i++) {
+    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {
+      var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];
+      
+      inputTextarea.addEventListener("input", ZooniverseRainfallRescueFormAlignChecksum);
+    }
+  }
+  
   
 }, 300, setIntervalIdBox, scriptValue);
 

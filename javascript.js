@@ -413,6 +413,28 @@ var setIntervalId = setInterval(function(){
     }
   }
   
+  // control checksum
+  
+  var formRow = document.createElement('TR');
+  
+  formTableTbody.appendChild(formRow);
+  var formTableTdCalculated = document.createElement('TD');
+  formRow.appendChild(formTableTdCalculated);
+  formRow.className = "greasemonkey-zooniverse-rainfall-rescue-form-control_checksum";
+  
+  var formTableTdIsDiffer = document.createElement('TD');
+  formRow.appendChild(formTableTdIsDiffer);
+  
+  var formTableRows = formTable.getElementsByTagName('tr');
+  for (i = 0; i < formTableRows.length; i++) {
+    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {
+      var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];
+      
+      inputTextarea.addEventListener("input", ZooniverseRainfallRescueFormAlignChecksum);
+    }
+  }
+  
+  
 }, 300, setIntervalIdBox, scriptValue);
 
 setIntervalIdBox.push(setIntervalId);

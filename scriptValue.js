@@ -239,6 +239,21 @@ function ZooniverseRainfallRescueFormAlignReloadFormWaiter() {
         formTableRowsInputs.push(formTableRows[i]);
         rowsFound++;
       }
+      
+      if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-control_checksum' + ' ') > -1) {
+        var tdElements = formTableRows[i].getElementsByTagName('td');
+        var formTableTdCalculated = tdElements[0];
+        var formTableTdIsDiffer = tdElements[1];
+        
+        var childNodes = formTableTdCalculated.childNodes;
+        for (k = 0; k < childNodes.length; k++) {
+          formTableTdCalculated.removeChild(childNodes[k]);
+        }
+        var childNodes = formTableTdIsDiffer.childNodes;
+        for (k = 0; k < childNodes.length; k++) {
+          formTableTdIsDiffer.removeChild(childNodes[k]);
+        }
+      }
     }
     
     
@@ -322,6 +337,17 @@ function ZooniverseRainfallRescueFormAlignReloadFormWaiter() {
       }
     }
     
+    // control checksum
+    
+    var formTableRows = formTable.getElementsByTagName('tr');
+    for (i = 0; i < formTableRows.length; i++) {
+      if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {
+        var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];
+        
+        inputTextarea.addEventListener("input", ZooniverseRainfallRescueFormAlignChecksum);
+      }
+    }
+    
     
     // turn off timer
     
@@ -333,6 +359,102 @@ function ZooniverseRainfallRescueFormAlignReloadFormWaiter() {
   setIntervalIdBox.push(setIntervalId);
 }
 
-function ZooniverseRainfallRescueFormAlignReloadForm() {
+function ZooniverseRainfallRescueFormAlignChecksum() {
   
+  var formTable = document.getElementById('greasemonkey-zooniverse-rainfall-rescue-form-form_table');
+  
+  
+  var formTableRows = formTable.getElementsByTagName('tr');
+  
+  var sumValue = 0;
+  var difference = 0;
+  var isDiffer = false;
+  var maxPrecision = 0;
+  
+  for (i = 0; i < formTableRows.length; i++) {
+    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {
+      var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];
+      
+      var inputValue = parseFloat(inputTextarea.value);
+      if (isNaN(inputValue)) {
+        inputValue = 0;
+      }
+//       alert(1);
+      var numberText = inputTextarea.value.trim().replace(',', '.');
+//       alert(2);
+      if (numberText.indexOf('.') > -1) {
+//       alert(3);
+        var numberParts = numberText.split('.');
+//       alert(4);
+        var numberPrecision = numberParts[1].length;
+//       alert(5);
+        if (numberPrecision> maxPrecision) {
+//       alert(6);
+          maxPrecision = numberPrecision;
+        }
+      }
+      if (i<13) {
+        sumValue = sumValue + inputValue;
+      } else {
+        var tmpsumValue = sumValue;
+        var tmpinputValue = inputValue;
+        if (maxPrecision > 0) {
+//       alert(7);
+          for (j=0; j<maxPrecision; j++) {
+//       alert(8);
+            tmpsumValue = tmpsumValue * 10;
+            tmpinputValue = tmpinputValue * 10;
+          }
+//       alert(9);
+        }
+        tmpsumValue = Math.round(tmpsumValue);
+//       alert(10);
+        tmpinputValue = Math.round(tmpinputValue);
+//       alert(11);
+        
+        
+        if (tmpsumValue == tmpinputValue) {
+          isDiffer = false;
+        } else {
+          isDiffer = true;
+          difference = inputValue - sumValue;
+        }
+      }
+    }
+    
+    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-control_checksum' + ' ') > -1) {
+      var tdElements = formTableRows[i].getElementsByTagName('td');
+      var formTableTdCalculated = tdElements[0];
+      var formTableTdIsDiffer = tdElements[1];
+      
+      var childNodes = formTableTdCalculated.childNodes;
+      for (k = 0; k < childNodes.length; k++) {
+        formTableTdCalculated.removeChild(childNodes[k]);
+      }
+      var childNodes = formTableTdIsDiffer.childNodes;
+      for (k = 0; k < childNodes.length; k++) {
+        formTableTdIsDiffer.removeChild(childNodes[k]);
+      }
+      
+      var checksumSpan = document.createElement('span');
+      var checksumContents = document.createTextNode(sumValue);
+      checksumSpan.appendChild(checksumContents);
+      formTableTdCalculated.appendChild(checksumSpan);
+      
+      var summarySpan = document.createElement('span');
+      if (!isDiffer) {
+        var summaryContents = document.createTextNode('equal');
+      } else {
+        var summaryContents = document.createTextNode(difference);
+        if (difference > 0) {
+          summarySpan.style.color = 'red';
+        } else {
+          summarySpan.style.color = 'blue';
+        }
+      }
+      
+      summarySpan.appendChild(summaryContents);
+      formTableTdIsDiffer.appendChild(summarySpan);
+    }
+  }
 }
