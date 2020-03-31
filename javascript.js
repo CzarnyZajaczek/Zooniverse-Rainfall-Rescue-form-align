@@ -3,7 +3,7 @@
 // @namespace   https://github.com/CzarnyZajaczek
 // @description align form with scan
 // @include     https://www.zooniverse.org/projects/edh/rainfall-rescue/classify
-// @version     0.2
+// @version     0.3
 // @author      Tomasz Dąbski "CzarnyZajaczek"
 // @license     GPL-3.0 http://www.gnu.org/licenses/gpl-3.0.txt
 // @grant       none
@@ -185,6 +185,7 @@ var setIntervalId = setInterval(function(){
   minusButton.style.backgroundColor = "red";
   minusButton.style.width = "30px";
   minusButton.style.height = "30px";
+  minusButton.title = "Decrease height of input form rows";
   
   headerTD = document.createElement('TD');
   headerTD.style.margin = "0px";
@@ -217,6 +218,7 @@ var setIntervalId = setInterval(function(){
   plusButton.style.backgroundColor = "green";
   plusButton.style.width = "30px";
   plusButton.style.height = "30px";
+  plusButton.title = "Increase height of input form rows";
   
   headerTD = document.createElement('TD');
   headerTD.style.margin = "0px";
