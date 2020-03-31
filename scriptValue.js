@@ -2,7 +2,7 @@
 //   
 // }
 
-// code copied from https://www.w3schools.com/howto/howto_js_draggable.asp
+// code of function ZooniverseRainfallRescueFormAligndragElement() copied from https://www.w3schools.com/howto/howto_js_draggable.asp and slightly adapted (function name and DOM ids)
 
 // Make the DIV element draggable:
 ZooniverseRainfallRescueFormAligndragElement(document.getElementById("greasemonkey-zooniverse-rainfall-rescue-form-aligned_verlay_form"));
@@ -137,12 +137,27 @@ function ZooniverseRainfallRescueFormAlignReloadFormWaiter() {
     }
     
     
+    var taskContainerParent = taskContainerElement.parentNode;
+    if (!taskContainerParent) {
+      return;
+    }
+    
+    var taskContainerParentButtons = taskContainerParent.getElementsByTagName('button');
+    if (!taskContainerParentButtons) {
+      return;
+    }
+    
+    
     var workflowTaskDivs = taskContainerElement.getElementsByTagName('div');
     var workflowTaskElements = [];
     
     for (i = 0; i < workflowTaskDivs.length; i++) {
       if ((' ' + workflowTaskDivs[i].className + ' ').indexOf(' ' + 'workflow-task' + ' ') > -1) {
         workflowTaskElements.push(workflowTaskDivs[i]);
+        var inputTextarea = workflowTaskDivs[i].getElementsByTagName('textarea')[0];
+        if (!inputTextarea) {
+          return;
+        }
       }
     }
     
@@ -332,7 +347,11 @@ function ZooniverseRainfallRescueFormAlignReloadFormWaiter() {
     for (i = 0; i < taskContainerParentButtons.length; i++) {
       var innerSpan = taskContainerParentButtons[i].getElementsByTagName('span')[0];
       if (innerSpan.innerHTML.trim().toLowerCase() == 'done') {
-        taskContainerParentButtons[i].addEventListener("click", ZooniverseRainfallRescueFormAlignReloadFormWaiter);
+        if (taskContainerParentButtons[i].addEventListener) {
+          taskContainerParentButtons[i].addEventListener("click", ZooniverseRainfallRescueFormAlignReloadFormWaiter);
+        } else if (taskContainerParentButtons[i].attachEvent) {
+          taskContainerParentButtons[i].attachEvent("onclick", ZooniverseRainfallRescueFormAlignReloadFormWaiter);
+        }
         break;
       }
     }
@@ -344,7 +363,11 @@ function ZooniverseRainfallRescueFormAlignReloadFormWaiter() {
       if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {
         var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];
         
-        inputTextarea.addEventListener("input", ZooniverseRainfallRescueFormAlignChecksum);
+        if (inputTextarea.addEventListener) {
+          inputTextarea.addEventListener("input", ZooniverseRainfallRescueFormAlignChecksum);
+        } else if (inputTextarea.attachEvent) {
+          inputTextarea.attachEvent("oninput", ZooniverseRainfallRescueFormAlignChecksum);
+        }
       }
     }
     
@@ -444,12 +467,17 @@ function ZooniverseRainfallRescueFormAlignChecksum() {
       var summarySpan = document.createElement('span');
       if (!isDiffer) {
         var summaryContents = document.createTextNode('equal');
+        summarySpan.style.color = 'green';
+        summarySpan.style.fontWeight = 'bold';
       } else {
-        var summaryContents = document.createTextNode(difference);
+        summarySpan.style.fontWeight = 'normal';
+        summarySpan.style.color = 'red';
         if (difference > 0) {
-          summarySpan.style.color = 'red';
+          var summaryContents = document.createTextNode('+'+difference);
+//           summarySpan.style.color = 'red';
         } else {
-          summarySpan.style.color = 'blue';
+          var summaryContents = document.createTextNode(difference);
+//           summarySpan.style.color = 'blue';
         }
       }
       
@@ -457,4 +485,9 @@ function ZooniverseRainfallRescueFormAlignChecksum() {
       formTableTdIsDiffer.appendChild(summarySpan);
     }
   }
+}
+
+
+function ZooniverseRainfallRescueFormAlignCommaDot() {
+  
 }

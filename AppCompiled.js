@@ -14,7 +14,7 @@
 var scriptValue = "// function ZooniverseRainfallRescueFormAlign() {\n"+
 "//   \n"+
 "// }\n"+
-"// code copied from https://www.w3schools.com/howto/howto_js_draggable.asp\n"+
+"// code of function ZooniverseRainfallRescueFormAligndragElement() copied from https://www.w3schools.com/howto/howto_js_draggable.asp and slightly adapted (function name and DOM ids)\n"+
 "// Make the DIV element draggable:\n"+
 "ZooniverseRainfallRescueFormAligndragElement(document.getElementById(\"greasemonkey-zooniverse-rainfall-rescue-form-aligned_verlay_form\"));\n"+
 "function ZooniverseRainfallRescueFormAligndragElement(elmnt) {\n"+
@@ -140,12 +140,27 @@ var scriptValue = "// function ZooniverseRainfallRescueFormAlign() {\n"+
 "    }\n"+
 "    \n"+
 "    \n"+
+"    var taskContainerParent = taskContainerElement.parentNode;\n"+
+"    if (!taskContainerParent) {\n"+
+"      return;\n"+
+"    }\n"+
+"    \n"+
+"    var taskContainerParentButtons = taskContainerParent.getElementsByTagName('button');\n"+
+"    if (!taskContainerParentButtons) {\n"+
+"      return;\n"+
+"    }\n"+
+"    \n"+
+"    \n"+
 "    var workflowTaskDivs = taskContainerElement.getElementsByTagName('div');\n"+
 "    var workflowTaskElements = [];\n"+
 "    \n"+
 "    for (i = 0; i < workflowTaskDivs.length; i++) {\n"+
 "      if ((' ' + workflowTaskDivs[i].className + ' ').indexOf(' ' + 'workflow-task' + ' ') > -1) {\n"+
 "        workflowTaskElements.push(workflowTaskDivs[i]);\n"+
+"        var inputTextarea = workflowTaskDivs[i].getElementsByTagName('textarea')[0];\n"+
+"        if (!inputTextarea) {\n"+
+"          return;\n"+
+"        }\n"+
 "      }\n"+
 "    }\n"+
 "    \n"+
@@ -334,7 +349,11 @@ var scriptValue = "// function ZooniverseRainfallRescueFormAlign() {\n"+
 "    for (i = 0; i < taskContainerParentButtons.length; i++) {\n"+
 "      var innerSpan = taskContainerParentButtons[i].getElementsByTagName('span')[0];\n"+
 "      if (innerSpan.innerHTML.trim().toLowerCase() == 'done') {\n"+
-"        taskContainerParentButtons[i].addEventListener(\"click\", ZooniverseRainfallRescueFormAlignReloadFormWaiter);\n"+
+"        if (taskContainerParentButtons[i].addEventListener) {\n"+
+"          taskContainerParentButtons[i].addEventListener(\"click\", ZooniverseRainfallRescueFormAlignReloadFormWaiter);\n"+
+"        } else if (taskContainerParentButtons[i].attachEvent) {\n"+
+"          taskContainerParentButtons[i].attachEvent(\"onclick\", ZooniverseRainfallRescueFormAlignReloadFormWaiter);\n"+
+"        }\n"+
 "        break;\n"+
 "      }\n"+
 "    }\n"+
@@ -346,7 +365,11 @@ var scriptValue = "// function ZooniverseRainfallRescueFormAlign() {\n"+
 "      if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {\n"+
 "        var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];\n"+
 "        \n"+
-"        inputTextarea.addEventListener(\"input\", ZooniverseRainfallRescueFormAlignChecksum);\n"+
+"        if (inputTextarea.addEventListener) {\n"+
+"          inputTextarea.addEventListener(\"input\", ZooniverseRainfallRescueFormAlignChecksum);\n"+
+"        } else if (inputTextarea.attachEvent) {\n"+
+"          inputTextarea.attachEvent(\"oninput\", ZooniverseRainfallRescueFormAlignChecksum);\n"+
+"        }\n"+
 "      }\n"+
 "    }\n"+
 "    \n"+
@@ -444,12 +467,17 @@ var scriptValue = "// function ZooniverseRainfallRescueFormAlign() {\n"+
 "      var summarySpan = document.createElement('span');\n"+
 "      if (!isDiffer) {\n"+
 "        var summaryContents = document.createTextNode('equal');\n"+
+"        summarySpan.style.color = 'green';\n"+
+"        summarySpan.style.fontWeight = 'bold';\n"+
 "      } else {\n"+
-"        var summaryContents = document.createTextNode(difference);\n"+
+"        summarySpan.style.fontWeight = 'normal';\n"+
+"        summarySpan.style.color = 'red';\n"+
 "        if (difference > 0) {\n"+
-"          summarySpan.style.color = 'red';\n"+
+"          var summaryContents = document.createTextNode('+'+difference);\n"+
+"//           summarySpan.style.color = 'red';\n"+
 "        } else {\n"+
-"          summarySpan.style.color = 'blue';\n"+
+"          var summaryContents = document.createTextNode(difference);\n"+
+"//           summarySpan.style.color = 'blue';\n"+
 "        }\n"+
 "      }\n"+
 "      \n"+
@@ -457,6 +485,9 @@ var scriptValue = "// function ZooniverseRainfallRescueFormAlign() {\n"+
 "      formTableTdIsDiffer.appendChild(summarySpan);\n"+
 "    }\n"+
 "  }\n"+
+"}\n"+
+"function ZooniverseRainfallRescueFormAlignCommaDot() {\n"+
+"  \n"+
 "}";
 
 var setIntervalIdBox = [];
@@ -494,6 +525,16 @@ var setIntervalId = setInterval(function(){
     return;
   }
   
+  var taskContainerParent = taskContainerElement.parentNode;
+  if (!taskContainerParent) {
+    return;
+  }
+  
+  var taskContainerParentButtons = taskContainerParent.getElementsByTagName('button');
+  if (!taskContainerParentButtons) {
+    return;
+  }
+  
   
   var workflowTaskDivs = taskContainerElement.getElementsByTagName('div');
   var workflowTaskElements = [];
@@ -501,6 +542,10 @@ var setIntervalId = setInterval(function(){
   for (i = 0; i < workflowTaskDivs.length; i++) {
     if ((' ' + workflowTaskDivs[i].className + ' ').indexOf(' ' + 'workflow-task' + ' ') > -1) {
       workflowTaskElements.push(workflowTaskDivs[i]);
+      var inputTextarea = workflowTaskDivs[i].getElementsByTagName('textarea')[0];
+      if (!inputTextarea) {
+        return;
+      }
     }
   }
   
@@ -832,14 +877,46 @@ var setIntervalId = setInterval(function(){
   
   parentDiv.insertBefore(scriptAddedDiv, headerElement);
   
-  var taskContainerParent = taskContainerElement.parentNode;
   
-  var taskContainerParentButtons = taskContainerParent.getElementsByTagName('button');
+  // control checksum
+  
+  var formRow = document.createElement('TR');
+  
+  formTableTbody.appendChild(formRow);
+  var formTableTdCalculated = document.createElement('TD');
+  formTableTdCalculated.title = "Total calculated";
+  formRow.appendChild(formTableTdCalculated);
+  formRow.className = "greasemonkey-zooniverse-rainfall-rescue-form-control_checksum";
+  var formTableTdCalculatedPlaceholder = document.createElement('SPAN');
+  formTableTdCalculatedPlaceholder.innerHTML = '&nbsp;';
+  formTableTdCalculated.appendChild(formTableTdCalculatedPlaceholder);
+  
+  var formTableTdIsDiffer = document.createElement('TD');
+  formRow.appendChild(formTableTdIsDiffer);
+  formTableTdIsDiffer.title = "Difference: total calculated - total inscribed";
+  
+  var formTableRows = formTable.getElementsByTagName('tr');
+  for (i = 0; i < formTableRows.length; i++) {
+    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {
+      var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];
+      if (inputTextarea.addEventListener) {
+        inputTextarea.addEventListener("input", ZooniverseRainfallRescueFormAlignChecksum);
+      } else if (inputTextarea.attachEvent) {
+        inputTextarea.attachEvent("oninput", ZooniverseRainfallRescueFormAlignChecksum);
+      }
+    }
+  }
+  
+  // move buttons ("done")
   
   for (i = 0; i < taskContainerParentButtons.length; i++) {
     var innerSpan = taskContainerParentButtons[i].getElementsByTagName('span')[0];
     if (innerSpan.innerHTML.trim().toLowerCase() == 'done') {
-      taskContainerParentButtons[i].addEventListener("click", ZooniverseRainfallRescueFormAlignReloadFormWaiter);
+      if (taskContainerParentButtons[i].addEventListener) {
+        taskContainerParentButtons[i].addEventListener("click", ZooniverseRainfallRescueFormAlignReloadFormWaiter);
+      } else if (taskContainerParentButtons[i].attachEvent) {
+        taskContainerParentButtons[i].attachEvent("onclick", ZooniverseRainfallRescueFormAlignReloadFormWaiter);
+      }
       break;
     }
   }
@@ -861,26 +938,6 @@ var setIntervalId = setInterval(function(){
     }
   }
   
-  // control checksum
-  
-  var formRow = document.createElement('TR');
-  
-  formTableTbody.appendChild(formRow);
-  var formTableTdCalculated = document.createElement('TD');
-  formRow.appendChild(formTableTdCalculated);
-  formRow.className = "greasemonkey-zooniverse-rainfall-rescue-form-control_checksum";
-  
-  var formTableTdIsDiffer = document.createElement('TD');
-  formRow.appendChild(formTableTdIsDiffer);
-  
-  var formTableRows = formTable.getElementsByTagName('tr');
-  for (i = 0; i < formTableRows.length; i++) {
-    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {
-      var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];
-      
-      inputTextarea.addEventListener("input", ZooniverseRainfallRescueFormAlignChecksum);
-    }
-  }
   
   
 }, 300, setIntervalIdBox, scriptValue);

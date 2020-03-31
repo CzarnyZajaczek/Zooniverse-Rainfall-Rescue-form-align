@@ -48,6 +48,16 @@ var setIntervalId = setInterval(function(){
     return;
   }
   
+  var taskContainerParent = taskContainerElement.parentNode;
+  if (!taskContainerParent) {
+    return;
+  }
+  
+  var taskContainerParentButtons = taskContainerParent.getElementsByTagName('button');
+  if (!taskContainerParentButtons) {
+    return;
+  }
+  
   
   var workflowTaskDivs = taskContainerElement.getElementsByTagName('div');
   var workflowTaskElements = [];
@@ -55,6 +65,10 @@ var setIntervalId = setInterval(function(){
   for (i = 0; i < workflowTaskDivs.length; i++) {
     if ((' ' + workflowTaskDivs[i].className + ' ').indexOf(' ' + 'workflow-task' + ' ') > -1) {
       workflowTaskElements.push(workflowTaskDivs[i]);
+      var inputTextarea = workflowTaskDivs[i].getElementsByTagName('textarea')[0];
+      if (!inputTextarea) {
+        return;
+      }
     }
   }
   
@@ -386,14 +400,46 @@ var setIntervalId = setInterval(function(){
   
   parentDiv.insertBefore(scriptAddedDiv, headerElement);
   
-  var taskContainerParent = taskContainerElement.parentNode;
   
-  var taskContainerParentButtons = taskContainerParent.getElementsByTagName('button');
+  // control checksum
+  
+  var formRow = document.createElement('TR');
+  
+  formTableTbody.appendChild(formRow);
+  var formTableTdCalculated = document.createElement('TD');
+  formTableTdCalculated.title = "Total calculated";
+  formRow.appendChild(formTableTdCalculated);
+  formRow.className = "greasemonkey-zooniverse-rainfall-rescue-form-control_checksum";
+  var formTableTdCalculatedPlaceholder = document.createElement('SPAN');
+  formTableTdCalculatedPlaceholder.innerHTML = '&nbsp;';
+  formTableTdCalculated.appendChild(formTableTdCalculatedPlaceholder);
+  
+  var formTableTdIsDiffer = document.createElement('TD');
+  formRow.appendChild(formTableTdIsDiffer);
+  formTableTdIsDiffer.title = "Difference: total calculated - total inscribed";
+  
+  var formTableRows = formTable.getElementsByTagName('tr');
+  for (i = 0; i < formTableRows.length; i++) {
+    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {
+      var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];
+      if (inputTextarea.addEventListener) {
+        inputTextarea.addEventListener("input", ZooniverseRainfallRescueFormAlignChecksum);
+      } else if (inputTextarea.attachEvent) {
+        inputTextarea.attachEvent("oninput", ZooniverseRainfallRescueFormAlignChecksum);
+      }
+    }
+  }
+  
+  // move buttons ("done")
   
   for (i = 0; i < taskContainerParentButtons.length; i++) {
     var innerSpan = taskContainerParentButtons[i].getElementsByTagName('span')[0];
     if (innerSpan.innerHTML.trim().toLowerCase() == 'done') {
-      taskContainerParentButtons[i].addEventListener("click", ZooniverseRainfallRescueFormAlignReloadFormWaiter);
+      if (taskContainerParentButtons[i].addEventListener) {
+        taskContainerParentButtons[i].addEventListener("click", ZooniverseRainfallRescueFormAlignReloadFormWaiter);
+      } else if (taskContainerParentButtons[i].attachEvent) {
+        taskContainerParentButtons[i].attachEvent("onclick", ZooniverseRainfallRescueFormAlignReloadFormWaiter);
+      }
       break;
     }
   }
@@ -415,26 +461,6 @@ var setIntervalId = setInterval(function(){
     }
   }
   
-  // control checksum
-  
-  var formRow = document.createElement('TR');
-  
-  formTableTbody.appendChild(formRow);
-  var formTableTdCalculated = document.createElement('TD');
-  formRow.appendChild(formTableTdCalculated);
-  formRow.className = "greasemonkey-zooniverse-rainfall-rescue-form-control_checksum";
-  
-  var formTableTdIsDiffer = document.createElement('TD');
-  formRow.appendChild(formTableTdIsDiffer);
-  
-  var formTableRows = formTable.getElementsByTagName('tr');
-  for (i = 0; i < formTableRows.length; i++) {
-    if ((' ' + formTableRows[i].className + ' ').indexOf(' ' + 'greasemonkey-zooniverse-rainfall-rescue-form-form_table_row' + ' ') > -1) {
-      var inputTextarea = formTableRows[i].getElementsByTagName('textarea')[0];
-      
-      inputTextarea.addEventListener("input", ZooniverseRainfallRescueFormAlignChecksum);
-    }
-  }
   
   
 }, 300, setIntervalIdBox, scriptValue);
