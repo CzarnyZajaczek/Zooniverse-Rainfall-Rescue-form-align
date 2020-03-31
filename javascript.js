@@ -3,7 +3,7 @@
 // @namespace   https://github.com/CzarnyZajaczek
 // @description align form with scan
 // @include     https://www.zooniverse.org/projects/edh/rainfall-rescue/classify
-// @version     0.3
+// @version     0.4
 // @author      Tomasz Dąbski "CzarnyZajaczek"
 // @license     GPL-3.0 http://www.gnu.org/licenses/gpl-3.0.txt
 // @grant       none
